@@ -3,29 +3,27 @@ package entities;
 import java.util.Date;
 
 public class Abastecimento {
-    private Date data;
+    private Date dataDeAbastecimento;
     private Double precoDeLitro;
-    private String tipoDeCombustivel;
     private Double quantidadeDeLitros;
     private Veiculo veiculo;
 
     public Abastecimento() {
     }
 
-    public Abastecimento(Date data, Double precoDeLitro, String tipoDeCombustivel, Double quantidadeDeLitros, Veiculo veiculo) {
-        this.data = data;
+    public Abastecimento(Date dataDeAbastecimento, Double precoDeLitro, String tipoDeCombustivel, Double quantidadeDeLitros, Veiculo veiculo) {
+        this.dataDeAbastecimento = dataDeAbastecimento;
         this.precoDeLitro = precoDeLitro;
-        this.tipoDeCombustivel = tipoDeCombustivel;
         this.quantidadeDeLitros = quantidadeDeLitros;
         this.veiculo = veiculo;
     }
 
     public Date getData() {
-        return data;
+        return dataDeAbastecimento;
     }
 
-    public void setData(Date data) {
-        this.data = data;
+    public void setData(Date dataDeAbastecimento) {
+        this.dataDeAbastecimento = dataDeAbastecimento;
     }
 
     public Double getPrecoDeLitro() {
@@ -34,14 +32,6 @@ public class Abastecimento {
 
     public void setPrecoDeLitro(Double precoDeLitro) {
         this.precoDeLitro = precoDeLitro;
-    }
-
-    public String getTipoDeCombustivel() {
-        return tipoDeCombustivel;
-    }
-
-    public void setTipoDeCombustivel(String tipoDeCombustivel) {
-        this.tipoDeCombustivel = tipoDeCombustivel;
     }
 
     public Double getQuantidadeDeLitros() {
