@@ -39,6 +39,7 @@ public class Veiculo {
     }
 
     public void cadastrarVeiculo() {
+        
 
     }
 }

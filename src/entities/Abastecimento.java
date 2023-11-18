@@ -1,20 +1,28 @@
 package entities;
 
+import java.sql.Connection;
 import java.util.Date;
+
+import com.mysql.cj.xdevapi.PreparableStatement;
+
+import connection.ConectaMySQL;
+import connection.Conectabanco;
 
 public class Abastecimento {
     private Date dataDeAbastecimento;
     private Double precoDeLitro;
     private Double quantidadeDeLitros;
+    private Double distanciaPercorrida;
     private Veiculo veiculo;
 
     public Abastecimento() {
     }
 
-    public Abastecimento(Date dataDeAbastecimento, Double precoDeLitro, String tipoDeCombustivel, Double quantidadeDeLitros, Veiculo veiculo) {
+    public Abastecimento(Date dataDeAbastecimento, Double precoDeLitro, String tipoDeCombustivel, Double distanciaPercorrida ,Double quantidadeDeLitros, Veiculo veiculo) {
         this.dataDeAbastecimento = dataDeAbastecimento;
         this.precoDeLitro = precoDeLitro;
         this.quantidadeDeLitros = quantidadeDeLitros;
+        this.distanciaPercorrida = distanciaPercorrida;
         this.veiculo = veiculo;
     }
 
@@ -42,6 +50,14 @@ public class Abastecimento {
         this.quantidadeDeLitros = quantidadeDeLitros;
     }
 
+    public Double getDistanciaPercorrida() {
+        return this.distanciaPercorrida;
+    }
+
+    public void setDistanciaPercorrida(Double distanciaPercorrida) {
+        this.distanciaPercorrida = distanciaPercorrida;
+    }
+
     public Veiculo getVeiculo() {
         return veiculo;
     }
@@ -50,7 +66,23 @@ public class Abastecimento {
         this.veiculo = veiculo;
     }
 
-    public void calculoPorLitro() {
-
+    public Double calculoPorLitro() {
+        double mediaKm = getDistanciaPercorrida()/getQuantidadeDeLitros();
+        return mediaKm;
     }
+
+    // public void cadastrarAbastecimento(){
+    //     Connection con = null;
+    //     PreparableStatement stmt = null;
+
+    //     try {
+    //         con = Conectabanco.getConexao();
+
+    //         String sql = "INSERT INTO Abastecimento (dataDeAbastecimento, precoDeLitro, tipoDeCombustivel, distanciaPercorrida, quantidadeDeLitros, veiculo_id)" +
+    //                     "VALUES (?, ?, ?, ?, ?, ?)";
+            
+    //         stmt = (PreparableStatement) con.prepareStatement(sql);
+    //     }
+        
+    // }
 }
