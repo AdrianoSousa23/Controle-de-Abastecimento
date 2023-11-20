@@ -1,45 +1,59 @@
 package entities;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Date;
 
-import com.mysql.cj.xdevapi.PreparableStatement;
+import javax.swing.JOptionPane;
 
 import connection.ConectaMySQL;
-import connection.Conectabanco;
 
-public class Abastecimento {
+public class Abastecimento extends Veiculo {
     private Date dataDeAbastecimento;
-    private Double precoDeLitro;
+    private String tipoCombustivel;
+    private Double precoPago;
     private Double quantidadeDeLitros;
     private Double distanciaPercorrida;
-    private Veiculo veiculo;
+    private Double mediaPorLitro;
 
     public Abastecimento() {
     }
-
-    public Abastecimento(Date dataDeAbastecimento, Double precoDeLitro, String tipoDeCombustivel, Double distanciaPercorrida ,Double quantidadeDeLitros, Veiculo veiculo) {
+    
+    public Abastecimento(String placaDoCarro, Date dataDeAbastecimento,
+            String tipoCombustivel, Double precoPago, Double quantidadeDeLitros, Double distanciaPercorrida,
+            Double mediaPorLitro) {
+        super(placaDoCarro);
         this.dataDeAbastecimento = dataDeAbastecimento;
-        this.precoDeLitro = precoDeLitro;
+        this.tipoCombustivel = tipoCombustivel;
+        this.precoPago = precoPago;
         this.quantidadeDeLitros = quantidadeDeLitros;
         this.distanciaPercorrida = distanciaPercorrida;
-        this.veiculo = veiculo;
+        this.mediaPorLitro = mediaPorLitro;
     }
 
-    public Date getData() {
+    public Date getDataDeAbastecimento() {
         return dataDeAbastecimento;
     }
 
-    public void setData(Date dataDeAbastecimento) {
+    public void setDataDeAbastecimento(Date dataDeAbastecimento) {
         this.dataDeAbastecimento = dataDeAbastecimento;
     }
 
-    public Double getPrecoDeLitro() {
-        return precoDeLitro;
+    public String getTipoCombustivel() {
+        return tipoCombustivel;
     }
 
-    public void setPrecoDeLitro(Double precoDeLitro) {
-        this.precoDeLitro = precoDeLitro;
+    public void setTipoCombustivel(String tipoCombustivel) {
+        this.tipoCombustivel = tipoCombustivel;
+    }
+
+    public Double getPrecoPago() {
+        return precoPago;
+    }
+
+    public void setPrecoPago(Double precoPago) {
+        this.precoPago = precoPago;
     }
 
     public Double getQuantidadeDeLitros() {
@@ -51,38 +65,48 @@ public class Abastecimento {
     }
 
     public Double getDistanciaPercorrida() {
-        return this.distanciaPercorrida;
+        return distanciaPercorrida;
     }
 
     public void setDistanciaPercorrida(Double distanciaPercorrida) {
         this.distanciaPercorrida = distanciaPercorrida;
     }
 
-    public Veiculo getVeiculo() {
-        return veiculo;
+    public Double getMediaPorLitro() {
+        return getDistanciaPercorrida()/getQuantidadeDeLitros();
     }
 
-    public void setVeiculo(Veiculo veiculo) {
-        this.veiculo = veiculo;
-    }
+    public void CadastrarAbastecimento(){
+        try {
+            ConectaMySQL conexao = new ConectaMySQL(); 
+            Connection cn = conexao.openDB();
+            PreparedStatement ps = cn.prepareStatement("INSERT INTO Abastecimento (veiculo_placaDoCarro, dataDeAbastecimento, tipoCombustivel, precoPago, quantidadeDeLitros, distanciaPercorrida, mediaPorLitro)"
+            + "VALUES (?, ?, ?, ?, ?, ?, ?)");
 
-    public Double calculoPorLitro() {
-        double mediaKm = getDistanciaPercorrida()/getQuantidadeDeLitros();
-        return mediaKm;
-    }
-
-    // public void cadastrarAbastecimento(){
-    //     Connection con = null;
-    //     PreparableStatement stmt = null;
-
-    //     try {
-    //         con = Conectabanco.getConexao();
-
-    //         String sql = "INSERT INTO Abastecimento (dataDeAbastecimento, precoDeLitro, tipoDeCombustivel, distanciaPercorrida, quantidadeDeLitros, veiculo_id)" +
-    //                     "VALUES (?, ?, ?, ?, ?, ?)";
+            ps.setString(1, getPlacaDoCarro()); //placaDoCarro
+            ps.setDate(2, new java.sql.Date(dataDeAbastecimento.getTime())); //dataDeAbastecimento
+            ps.setString(3, tipoCombustivel); //tipoCombustivel
+            ps.setDouble(4, precoPago); //precoPago
+            ps.setDouble(5, quantidadeDeLitros); //quantidadeDeLitros
+            ps.setDouble(6, distanciaPercorrida); //distanciaPercorrida
+            ps.setDouble(7, mediaPorLitro);
             
-    //         stmt = (PreparableStatement) con.prepareStatement(sql);
-    //     }
-        
-    // }
+
+            ps.executeUpdate();
+
+            JOptionPane.showMessageDialog(null, "Abastecimento cadastrado com sucesso.");
+
+            ps.close();
+            cn.close();
+
+            System.out.println("Conexão encerrada");
+        } catch (SQLException e) {
+            System.out.println("Falha ao realizar a operação.");
+            e.printStackTrace();
+        }
+
+    }
+
+
+
 }
