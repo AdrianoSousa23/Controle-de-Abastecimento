@@ -36,6 +36,15 @@ public class ControleAbastecimento {
     private JTextArea resultadoTextArea;
     private JTable veiculosTable;
 
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new ControleAbastecimento();
+            }
+        });
+    }
+
     public ControleAbastecimento() {
         abastecimentos = new ArrayList<>();
         initialize();
@@ -43,8 +52,8 @@ public class ControleAbastecimento {
 
     private void initialize() {
         frame = new JFrame("Controle de Abastecimento");
-        frame.setSize(800, 600);  // Definindo tamanho inicial
-        frame.setBounds(100, 100, 800, 600);
+        frame.setSize(1920, 1080);  // Definindo tamanho inicial
+        frame.setBounds(100, 100, 1920, 1080);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel panel = new JPanel(new GridBagLayout());
@@ -205,14 +214,5 @@ public class ControleAbastecimento {
 
         // Exibir resultado
         resultadoTextArea.setText("Média de Km por Litro: " + String.format("%.2f", mediaKmPorLitro));
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new ControleAbastecimento();
-            }
-        });
     }
 }

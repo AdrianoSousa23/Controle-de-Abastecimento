@@ -15,7 +15,7 @@ public class ExemploPreparedStatement {
         try {
             ConectaMySQL conexao = new ConectaMySQL(); 
             Connection cn = conexao.openDB();
-            PreparedStatement ps = cn.prepareStatement("INSERT INTO Veiculo (placa,  modelo, anoDeFabricacao)"
+            PreparedStatement ps = cn.prepareStatement("INSERT INTO Veiculo (placaDoCarro,  modeloDoCarro, anoDoCarro)"
             + "VALUES (?, ?, ?)");
 
             ps.setString(1, "EUVI123"); //placa
