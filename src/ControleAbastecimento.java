@@ -1,17 +1,32 @@
-import entities.Abastecimento;
-import entities.Combustivel;
-import entities.Posto;
-import entities.Veiculo;
-
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import com.toedter.calendar.JDateChooser;
+
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
+
+import entities.Abastecimento;
+import entities.Posto;
+import entities.Veiculo;
 
 public class ControleAbastecimento {
     private List<Abastecimento> abastecimentos;
@@ -30,8 +45,8 @@ public class ControleAbastecimento {
 
     private void initialize() {
         frame = new JFrame("Controle de Abastecimento");
-        frame.setSize(800, 600);  // Definindo tamanho inicial
-        frame.setBounds(100, 100, 800, 600);
+        frame.setSize(900, 1000);  // Definindo tamanho inicial
+        frame.setBounds(100, 100, 1800, 1000);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel panel = new JPanel(new GridBagLayout());
@@ -105,6 +120,7 @@ public class ControleAbastecimento {
     }
 
     private JPanel criarPainelCombustivel() {
+
         JPanel combustivelPanel = new JPanel();
         combustivelPanel.setBorder(BorderFactory.createTitledBorder("Combustível"));
         postoNomeField = new JTextField(10);
@@ -128,128 +144,47 @@ public class ControleAbastecimento {
         combustivelPanel.add(abastecimentoDistanciaPercorridaField);
         combustivelPanel.add(new JLabel("Tipo de Combustível:"));
         combustivelPanel.add(tipoCombustivelComboBox);
+
         return combustivelPanel;
     }
 
     private JPanel criarPainelCalcular() {
         JPanel calcularPanel = new JPanel();
+        Veiculo veiculo = new Veiculo();
+        Abastecimento abastecimento = new Abastecimento();
         calcularPanel.setBorder(BorderFactory.createTitledBorder("Calcular"));
 
         JButton cadastrarVeiculoButton = new JButton("Cadastrar Veículo");
         cadastrarVeiculoButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                cadastrarVeiculo();
-            }
-        });
-
-        JButton cadastrarAbastecimentoButton = new JButton("Cadastrar Abastecimento");
-        cadastrarAbastecimentoButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                cadastrarAbastecimento();
-            }
-        });
-
-        JButton calcularMediaButton = new JButton("Calcular Média por Litro");
-        calcularMediaButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+                veiculo.cadastrarVeiculo();
+                abastecimento.CadastrarAbastecimento();
                 calcularMediaPorLitro();
             }
         });
 
+
         calcularPanel.add(cadastrarVeiculoButton);
-        calcularPanel.add(cadastrarAbastecimentoButton);
-        calcularPanel.add(calcularMediaButton);
 
         return calcularPanel;
     }
 
-    private void cadastrarAbastecimento() {
-        try {
-            // Obter dados do veículo
-            String placa = veiculoPlacaField.getText();
-            String modelo = veiculoModeloField.getText();
-            int ano = Integer.parseInt(veiculoAnoField.getText());
-            Veiculo veiculo = new Veiculo(placa, modelo, ano);
-
-            // Obter dados do posto
-            String nomePosto = postoNomeField.getText();
-            String localizacaoPosto = postoLocalizacaoField.getText();
-            Posto posto = new Posto(nomePosto, localizacaoPosto);
-
-            // Obter dados do abastecimento
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-            Date data = dateFormat.parse(abastecimentoDataField.getText());
-            Double precoLitro = Double.parseDouble(abastecimentoPrecoLitroField.getText());
-            Double quantidadeLitros = Double.parseDouble(abastecimentoQuantidadeLitrosField.getText());
-            Double distanciaPercorrida = Double.parseDouble(abastecimentoDistanciaPercorridaField.getText());
-            String tipoCombustivel = (String) tipoCombustivelComboBox.getSelectedItem();
-
-            // Criar objeto Combustivel
-            Combustivel combustivel = new Combustivel(data, precoLitro, tipoCombustivel, distanciaPercorrida,
-                    quantidadeLitros, veiculo, tipoCombustivel, 0.0, 0.0, 0.0);
-
-            // Adicionar abastecimento à lista
-            Abastecimento abastecimento = new Abastecimento(data, precoLitro, tipoCombustivel, distanciaPercorrida,
-                    quantidadeLitros, veiculo);
-            abastecimentos.add(abastecimento);
-
-            // Limpar campos após o cadastro
-            veiculoPlacaField.setText("");
-            veiculoModeloField.setText("");
-            veiculoAnoField.setText("");
-            postoNomeField.setText("");
-            postoLocalizacaoField.setText("");
-            abastecimentoDataField.setText("");
-            abastecimentoPrecoLitroField.setText("");
-            abastecimentoQuantidadeLitrosField.setText("");
-            abastecimentoDistanciaPercorridaField.setText("");
-
-            // Exibir mensagem de sucesso
-            JOptionPane.showMessageDialog(frame, "Abastecimento cadastrado com sucesso!");
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(frame, "Erro ao cadastrar abastecimento. Verifique os dados informados.");
-        }
-    }
-
-    private void cadastrarVeiculo() {
-        try {
-            // Obter dados do veículo
-            String placa = veiculoPlacaField.getText();
-            String modelo = veiculoModeloField.getText();
-            int ano = Integer.parseInt(veiculoAnoField.getText());
-
-            // Criar objeto Veiculo
-            Veiculo veiculo = new Veiculo(placa, modelo, ano);
-
-            // Adicionar veículo à lista (opcional)
-            // veiculos.add(veiculo);
-
-            // Limpar campos após o cadastro
-            veiculoPlacaField.setText("");
-            veiculoModeloField.setText("");
-            veiculoAnoField.setText("");
-
-            // Exibir mensagem de sucesso
-            JOptionPane.showMessageDialog(frame, "Veículo cadastrado com sucesso!");
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(frame, "Erro ao cadastrar veículo. Verifique os dados informados.");
-        }
-    }
 
     private void listarVeiculos() {
         // Configurar modelo da tabela
         DefaultTableModel model = new DefaultTableModel();
-        model.addColumn("Placa");
         model.addColumn("Modelo");
-        model.addColumn("Ano");
+        model.addColumn("Data de Abastecimento");
+        model.addColumn("Média por litro");
+        model.addColumn("Posto");
 
         // Preencher modelo com dados dos veículos
         for (Abastecimento abastecimento : abastecimentos) {
-            Veiculo veiculo = abastecimento.getVeiculo();
-            model.addRow(new Object[]{veiculo.getPlaca(), veiculo.getModelo(), veiculo.getAnoDeFabricacao()});
+            Veiculo veiculo = new Veiculo();
+            Posto posto = new Posto();
+            veiculo.getModeloDoCarro();
+            model.addRow(new Object[]{veiculo.getModeloDoCarro(),abastecimento.getDataDeAbastecimento(), abastecimento.getMediaPorLitro(), posto.getNome()});
         }
 
         // Configurar tabela
