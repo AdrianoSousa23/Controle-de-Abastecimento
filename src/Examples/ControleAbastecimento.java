@@ -1,3 +1,5 @@
+package Examples;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -5,6 +7,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,9 +28,10 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
+
 import com.toedter.calendar.JDateChooser;
 
-
+import connection.ConectaMySQL;
 import entities.Abastecimento;
 import entities.Posto;
 import entities.Veiculo;
@@ -167,7 +175,7 @@ public class ControleAbastecimento {
         cadastrarVeiculoButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                veiculo.cadastrarVeiculo();
+                cadastrarVeiculo();
                 abastecimento.CadastrarAbastecimento();
                 posto.cadastrarPosto();
                 calcularMediaPorLitro();
@@ -179,7 +187,7 @@ public class ControleAbastecimento {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    veiculo.excluirVeiculo();
+                    excluirVeiculo();
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
@@ -242,5 +250,79 @@ public class ControleAbastecimento {
                 new ControleAbastecimento();
             }
         });
+    }
+
+public void cadastrarVeiculo() {
+    try {
+        ConectaMySQL conexao = new ConectaMySQL(); 
+        Connection cn = conexao.openDB();
+        PreparedStatement ps = cn.prepareStatement("INSERT INTO Veiculo (placaDoCarro,  modeloDoCarro, anoDoCarro)"
+        + "VALUES (?, ?, ?)");
+
+        ps.setString(1, veiculoPlacaField.getText()); //placa
+        ps.setString(2, veiculoModeloField.getText()); //modelo
+        ps.setInt(3, Integer.parseInt(veiculoAnoField.getText())); //anoDeFabricacao
+
+        ps.executeUpdate();
+
+        JOptionPane.showMessageDialog(null, "Carro Cadastrado com sucesso!");
+
+        ps.close();
+        cn.close();
+
+        System.out.println("Conexão encerrada");
+    } catch (SQLException e) {
+        System.out.println("Falha ao realizar a operação.");
+        e.printStackTrace();
+    }
+}
+
+    public void excluirVeiculo() throws Exception {
+        Connection cn = null;
+        Statement st = null;
+
+        try {
+            cn = ConectaMySQL.openDB();
+            st = cn.createStatement();
+            String placa = JOptionPane.showInputDialog("Digite a placa do carro a ser excluido");
+            Veiculo excluido = consultarPlaca(placa);
+            int resp = JOptionPane.showConfirmDialog(null, "Confirma a exclusão do carro com a placa: \n" + excluido);
+
+            if(resp == 0) {
+                st.executeUpdate("DELETE FROM Veiculos WHERE placaDoCarro='" + 
+                    excluido.getPlacaDoCarro() + "'");
+                JOptionPane.showMessageDialog(null, "O Carro com a placa " +
+                    excluido.getPlacaDoCarro() + " foi excluído com sucesso!!!");
+            } else {
+                JOptionPane.showMessageDialog(null, "O Carro com a placa " +
+                    excluido.getPlacaDoCarro() + " não foi excluído");
+            }
+        } catch (SQLException e) {
+            throw new Exception("Falha ao acessar base de dados. \n" + e.getMessage());
+        } finally {
+            st.close();
+            cn.close();
+        }
+    }
+
+    public Veiculo consultarPlaca(String nome) throws Exception {
+        Veiculo veiculo = null;
+        String querycmd = "select * from veiculos where " + "placaDoCarro like ? ";
+
+        try {
+            Connection con = ConectaMySQL.openDB();
+            PreparedStatement ps1 = con.prepareStatement(querycmd);
+            ps1.setString(1, (nome != null ? nome.trim() : ""));
+            ResultSet rs = ps1.executeQuery();
+            while(rs.next()) {
+                String placaDoCarro = rs.getString("placaDoCarro");
+               veiculo = new Veiculo(placaDoCarro);
+            }
+        } catch (SQLException e) {
+            throw new Exception(e);
+        } finally {
+            ConectaMySQL.closeDB();
+        }
+        return veiculo;
     }
 }
