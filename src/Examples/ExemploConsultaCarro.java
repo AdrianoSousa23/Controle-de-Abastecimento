@@ -20,7 +20,7 @@ public class ExemploConsultaCarro{
 
     static Veiculo consultarPlaca(String nome) throws Exception {
         Veiculo veiculo = null;
-        String querycmd = "select * from veiculos where " + "placaDoCarro like ? ";
+        String querycmd = "select * from veiculo where " + "placaDoCarro like ? ";
 
         try {
             con = ConectaMySQL.openDB();

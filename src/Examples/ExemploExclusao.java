@@ -30,7 +30,7 @@ public class ExemploExclusao {
             int resp = JOptionPane.showConfirmDialog(null, "Confirma a exclusão do carro com a placa: \n" + excluido);
 
             if(resp == 0) {
-                st.executeUpdate("DELETE FROM Veiculos WHERE placaDoCarro='" + 
+                st.executeUpdate("DELETE FROM Veiculo WHERE placaDoCarro='" +
                     excluido.getPlacaDoCarro() + "'");
                 JOptionPane.showMessageDialog(null, "O Carro com a placa " +
                     excluido.getPlacaDoCarro() + " foi excluído com sucesso!!!");

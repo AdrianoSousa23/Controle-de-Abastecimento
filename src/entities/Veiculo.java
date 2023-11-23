@@ -53,6 +53,10 @@ public class Veiculo {
         this.anoDoCarro = anoDoCarro;
     }
 
+    @Override
+    public String toString() {
+        return "placaDoCarro='" + placaDoCarro + '\'';
+    }
 
     public void cadastrarVeiculo() {
         try {
