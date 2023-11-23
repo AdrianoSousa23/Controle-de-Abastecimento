@@ -21,6 +21,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
+import com.toedter.calendar.JDateChooser;
+
 
 import entities.Abastecimento;
 import entities.Posto;
@@ -28,6 +30,9 @@ import entities.Veiculo;
 
 public class ControleAbastecimento {
     private List<Abastecimento> abastecimentos;
+
+    private JDateChooser abastecimentoDateChooser;
+
 
     private JFrame frame;
     private JTextField veiculoPlacaField, veiculoModeloField, veiculoAnoField, postoNomeField, postoLocalizacaoField, abastecimentoDataField, abastecimentoPrecoLitroField,
@@ -44,7 +49,7 @@ public class ControleAbastecimento {
     private void initialize() {
         frame = new JFrame("Controle de Abastecimento");
         frame.setSize(800, 600);  // Definindo tamanho inicial
-        frame.setBounds(100, 100, 800, 600);
+        frame.setBounds(100, 100, 1920, 1080);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel panel = new JPanel(new GridBagLayout());
@@ -122,17 +127,22 @@ public class ControleAbastecimento {
         combustivelPanel.setBorder(BorderFactory.createTitledBorder("Combustível"));
         postoNomeField = new JTextField(10);
         postoLocalizacaoField = new JTextField(10);
-        abastecimentoDataField = new JTextField(10);
+
+        // Substitua o JTextField por JDateChooser para a data de abastecimento
+        abastecimentoDateChooser = new JDateChooser();
+        abastecimentoDateChooser.setDateFormatString("dd/MM/yyyy");
+
         abastecimentoPrecoLitroField = new JTextField(10);
         abastecimentoQuantidadeLitrosField = new JTextField(10);
         abastecimentoDistanciaPercorridaField = new JTextField(10);
         tipoCombustivelComboBox = new JComboBox<>(new String[]{"Gasolina", "Etanol", "Diesel"});
+
         combustivelPanel.add(new JLabel("Nome do Posto:"));
         combustivelPanel.add(postoNomeField);
         combustivelPanel.add(new JLabel("Localização do Posto:"));
         combustivelPanel.add(postoLocalizacaoField);
         combustivelPanel.add(new JLabel("Data do Abastecimento:"));
-        combustivelPanel.add(abastecimentoDataField);
+        combustivelPanel.add(abastecimentoDateChooser);
         combustivelPanel.add(new JLabel("Preço por Litro:"));
         combustivelPanel.add(abastecimentoPrecoLitroField);
         combustivelPanel.add(new JLabel("Quantidade de Litros:"));
@@ -141,13 +151,16 @@ public class ControleAbastecimento {
         combustivelPanel.add(abastecimentoDistanciaPercorridaField);
         combustivelPanel.add(new JLabel("Tipo de Combustível:"));
         combustivelPanel.add(tipoCombustivelComboBox);
+
         return combustivelPanel;
     }
+
 
     private JPanel criarPainelCalcular() {
         JPanel calcularPanel = new JPanel();
         Veiculo veiculo = new Veiculo();
         Abastecimento abastecimento = new Abastecimento();
+        Posto posto = new Posto();
         calcularPanel.setBorder(BorderFactory.createTitledBorder("Calcular"));
 
         JButton cadastrarVeiculoButton = new JButton("Cadastrar Veículo");
@@ -156,12 +169,27 @@ public class ControleAbastecimento {
             public void actionPerformed(ActionEvent e) {
                 veiculo.cadastrarVeiculo();
                 abastecimento.CadastrarAbastecimento();
+                posto.cadastrarPosto();
                 calcularMediaPorLitro();
             }
         });
 
+        JButton excluirVeiculoButton = new JButton("Excluir veiculo");
+        excluirVeiculoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    veiculo.excluirVeiculo();
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+                listarVeiculos();
+            }
+        });
 
         calcularPanel.add(cadastrarVeiculoButton);
+        calcularPanel.add(excluirVeiculoButton);
+
 
         return calcularPanel;
     }

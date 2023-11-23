@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Date;
+import com.toedter.calendar.JDateChooser;
+
 
 import javax.swing.JOptionPane;
 
@@ -16,6 +18,7 @@ public class Abastecimento extends Veiculo {
     private Double quantidadeDeLitros;
     private Double distanciaPercorrida;
     private Double mediaPorLitro;
+    private JDateChooser abastecimentoDateChooser;
 
     public Abastecimento() {
     }
@@ -84,7 +87,7 @@ public class Abastecimento extends Veiculo {
             + "VALUES (?, ?, ?, ?, ?, ?, ?)");
 
             ps.setString(1, getPlacaDoCarro()); //placaDoCarro
-            ps.setDate(2, new java.sql.Date(dataDeAbastecimento.getTime())); //dataDeAbastecimento
+            ps.setDate(2, new java.sql.Date(abastecimentoDateChooser.getDate().getTime())); // dataDeAbastecimento
             ps.setString(3, tipoCombustivel); //tipoCombustivel
             ps.setDouble(4, precoPago); //precoPago
             ps.setDouble(5, quantidadeDeLitros); //quantidadeDeLitros
