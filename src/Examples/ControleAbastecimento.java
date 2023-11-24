@@ -38,6 +38,7 @@ import entities.Veiculo;
 
 public class ControleAbastecimento {
     private List<Abastecimento> abastecimentos;
+    private List<Veiculo> veiculos;
 
     private JDateChooser abastecimentoDateChooser;
 
@@ -51,6 +52,7 @@ public class ControleAbastecimento {
 
     public ControleAbastecimento() {
         abastecimentos = new ArrayList<>();
+        veiculos = new ArrayList<>();
         initialize();
     }
 
@@ -176,8 +178,8 @@ public class ControleAbastecimento {
             @Override
             public void actionPerformed(ActionEvent e) {
                 cadastrarVeiculo();
-                abastecimento.CadastrarAbastecimento();
-                posto.cadastrarPosto();
+                CadastrarAbastecimento();
+                cadastrarPosto();
                 calcularMediaPorLitro();
             }
         });
@@ -205,22 +207,42 @@ public class ControleAbastecimento {
     private void listarVeiculos() {
         // Configurar modelo da tabela
         DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("Placa");
         model.addColumn("Modelo");
-        model.addColumn("Data de Abastecimento");
-        model.addColumn("Média por litro");
-        model.addColumn("Posto");
+        model.addColumn("Ano de Fabricação");
 
         // Preencher modelo com dados dos veículos
-        for (Abastecimento abastecimento : abastecimentos) {
-            Veiculo veiculo = new Veiculo();
-            Posto posto = new Posto();
-            veiculo.getModeloDoCarro();
-            model.addRow(new Object[]{veiculo.getModeloDoCarro(),abastecimento.getDataDeAbastecimento(), abastecimento.getMediaPorLitro(), posto.getNome()});
+        for (Veiculo veiculo : veiculos) {
+            model.addRow(new Object[]{veiculo.getPlacaDoCarro(), veiculo.getModeloDoCarro(), veiculo.getAnoDoCarro()});
         }
 
         // Configurar tabela
         veiculosTable.setModel(model);
+
+        ((DefaultTableModel) veiculosTable.getModel()).fireTableDataChanged();
     }
+
+//modelo que queremos usar
+
+//    private void listarVeiculos() {
+//        // Configurar modelo da tabela
+//        DefaultTableModel model = new DefaultTableModel();
+//        model.addColumn("Modelo");
+//        model.addColumn("Data de Abastecimento");
+//        model.addColumn("Média por litro");
+//        model.addColumn("Posto");
+//
+//        // Preencher modelo com dados dos veículos
+//        for (Abastecimento abastecimento : abastecimentos) {
+//            Veiculo veiculo = new Veiculo();
+//            Posto posto = new Posto();
+//            veiculo.getModeloDoCarro();
+//            model.addRow(new Object[]{veiculo.getModeloDoCarro(),abastecimento.getDataDeAbastecimento(), abastecimento.getMediaPorLitro(), posto.getNome()});
+//        }
+//
+//        // Configurar tabela
+//        veiculosTable.setModel(model);
+//    }
 
     private void calcularMediaPorLitro() {
         if (abastecimentos.isEmpty()) {
@@ -267,8 +289,18 @@ public void cadastrarVeiculo() {
 
         JOptionPane.showMessageDialog(null, "Carro Cadastrado com sucesso!");
 
+        Veiculo veiculoCadastrado = new Veiculo(
+                veiculoPlacaField.getText(),
+                veiculoModeloField.getText(),
+                Integer.parseInt(veiculoAnoField.getText())
+        );
+        veiculos.add(veiculoCadastrado);
+
         ps.close();
         cn.close();
+
+        // Atualiza a tabela de veículos
+        listarVeiculos();
 
         System.out.println("Conexão encerrada");
     } catch (SQLException e) {
@@ -277,6 +309,64 @@ public void cadastrarVeiculo() {
     }
 }
 
+    public void CadastrarAbastecimento(){
+        try {
+            ConectaMySQL conexao = new ConectaMySQL();
+            Connection cn = conexao.openDB();
+            PreparedStatement ps = cn.prepareStatement("INSERT INTO Abastecimento (veiculo_placaDoCarro, dataDeAbastecimento, tipoCombustivel, precoPago, quantidadeDeLitros, distanciaPercorrida, mediaPorLitro)"
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?)");
+
+            ps.setString(1, veiculoPlacaField.getText()); //placaDoCarro
+            ps.setDate(2, new java.sql.Date(abastecimentoDateChooser.getDate().getTime())); // dataDeAbastecimento
+            ps.setString(3, tipoCombustivelComboBox.getActionCommand()); //tipoCombustivel
+            ps.setDouble(4, Double.parseDouble(abastecimentoPrecoLitroField.getText())); //precoPago
+            ps.setDouble(5, Double.parseDouble(abastecimentoQuantidadeLitrosField.getText())); //quantidadeDeLitros
+            ps.setDouble(6, Double.parseDouble(abastecimentoDistanciaPercorridaField.getText())); //distanciaPercorrida
+
+
+
+            ps.executeUpdate();
+
+            JOptionPane.showMessageDialog(null, "Abastecimento cadastrado com sucesso.");
+
+            ps.close();
+            cn.close();
+
+            System.out.println("Conexão encerrada");
+        } catch (SQLException e) {
+            System.out.println("Falha ao realizar a operação.");
+            e.printStackTrace();
+        }
+
+    }
+
+
+    public void cadastrarPosto() {
+        try {
+            ConectaMySQL conexao = new ConectaMySQL();
+            Connection cn = conexao.openDB();
+            PreparedStatement ps = cn.prepareStatement("INSERT INTO Posto (veiculo_placaDoCarro, nome,  localizacao)"
+                    + "VALUES (?,?,?)");
+
+            ps.setString(1, veiculoPlacaField.getText()); //nome
+            ps.setString(2, postoNomeField.getText()); //localizacao
+            ps.setString(3, postoLocalizacaoField.getText()); //veiculo_placaDoCarro
+
+            ps.executeUpdate();
+
+            JOptionPane.showMessageDialog(null, "Posto cadastrado com sucesso.");
+
+            ps.close();
+            cn.close();
+
+            System.out.println("Conexão encerrada");
+
+        } catch (SQLException e) {
+            System.out.println("Falha ao realizar a operação.");
+            e.printStackTrace();
+        }
+
+    }
     public void excluirVeiculo() throws Exception {
         Connection cn = null;
         Statement st = null;

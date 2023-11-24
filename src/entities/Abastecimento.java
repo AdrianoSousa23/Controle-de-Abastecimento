@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Date;
-import com.toedter.calendar.JDateChooser;
+//import com.toedter.calendar.JDateChooser;
 
 
 import javax.swing.JOptionPane;
@@ -18,7 +18,7 @@ public class Abastecimento extends Veiculo {
     private Double quantidadeDeLitros;
     private Double distanciaPercorrida;
     private Double mediaPorLitro;
-    private JDateChooser abastecimentoDateChooser;
+//    private JDateChooser abastecimentoDateChooser;
 
     public Abastecimento() {
     }
@@ -79,36 +79,36 @@ public class Abastecimento extends Veiculo {
         return getDistanciaPercorrida()/getQuantidadeDeLitros();
     }
 
-    public void CadastrarAbastecimento(){
-        try {
-            ConectaMySQL conexao = new ConectaMySQL(); 
-            Connection cn = conexao.openDB();
-            PreparedStatement ps = cn.prepareStatement("INSERT INTO Abastecimento (veiculo_placaDoCarro, dataDeAbastecimento, tipoCombustivel, precoPago, quantidadeDeLitros, distanciaPercorrida, mediaPorLitro)"
-            + "VALUES (?, ?, ?, ?, ?, ?, ?)");
-
-            ps.setString(1, getPlacaDoCarro()); //placaDoCarro
-            ps.setDate(2, new java.sql.Date(abastecimentoDateChooser.getDate().getTime())); // dataDeAbastecimento
-            ps.setString(3, tipoCombustivel); //tipoCombustivel
-            ps.setDouble(4, precoPago); //precoPago
-            ps.setDouble(5, quantidadeDeLitros); //quantidadeDeLitros
-            ps.setDouble(6, distanciaPercorrida); //distanciaPercorrida
-            ps.setDouble(7, mediaPorLitro);
-            
-
-            ps.executeUpdate();
-
-            JOptionPane.showMessageDialog(null, "Abastecimento cadastrado com sucesso.");
-
-            ps.close();
-            cn.close();
-
-            System.out.println("Conexão encerrada");
-        } catch (SQLException e) {
-            System.out.println("Falha ao realizar a operação.");
-            e.printStackTrace();
-        }
-
-    }
+//    public void CadastrarAbastecimento(){
+//        try {
+//            ConectaMySQL conexao = new ConectaMySQL();
+//            Connection cn = conexao.openDB();
+//            PreparedStatement ps = cn.prepareStatement("INSERT INTO Abastecimento (veiculo_placaDoCarro, dataDeAbastecimento, tipoCombustivel, precoPago, quantidadeDeLitros, distanciaPercorrida, mediaPorLitro)"
+//            + "VALUES (?, ?, ?, ?, ?, ?, ?)");
+//
+//            ps.setString(1, getPlacaDoCarro()); //placaDoCarro
+//            ps.setDate(2, new java.sql.Date(abastecimentoDateChooser.getDate().getTime())); // dataDeAbastecimento
+//            ps.setString(3, tipoCombustivel); //tipoCombustivel
+//            ps.setDouble(4, precoPago); //precoPago
+//            ps.setDouble(5, quantidadeDeLitros); //quantidadeDeLitros
+//            ps.setDouble(6, distanciaPercorrida); //distanciaPercorrida
+//            ps.setDouble(7, mediaPorLitro);
+//
+//
+//            ps.executeUpdate();
+//
+//            JOptionPane.showMessageDialog(null, "Abastecimento cadastrado com sucesso.");
+//
+//            ps.close();
+//            cn.close();
+//
+//            System.out.println("Conexão encerrada");
+//        } catch (SQLException e) {
+//            System.out.println("Falha ao realizar a operação.");
+//            e.printStackTrace();
+//        }
+//
+//    }
 
 
 
