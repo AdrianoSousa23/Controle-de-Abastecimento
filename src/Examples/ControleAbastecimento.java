@@ -173,18 +173,18 @@ public class ControleAbastecimento {
         Posto posto = new Posto();
         calcularPanel.setBorder(BorderFactory.createTitledBorder("Calcular"));
 
-        JButton cadastrarVeiculoButton = new JButton("Cadastrar Veículo");
+        JButton cadastrarVeiculoButton = new JButton("Cadastrar Abastecimento");
         cadastrarVeiculoButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 cadastrarVeiculo();
                 CadastrarAbastecimento();
-                cadastrarPosto();
-                calcularMediaPorLitro();
+                //cadastrarPosto();
+
             }
         });
 
-        JButton excluirVeiculoButton = new JButton("Excluir veiculo");
+        JButton excluirVeiculoButton = new JButton("Excluir Abastecimento");
         excluirVeiculoButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -200,7 +200,6 @@ public class ControleAbastecimento {
         calcularPanel.add(cadastrarVeiculoButton);
         calcularPanel.add(excluirVeiculoButton);
 
-
         return calcularPanel;
     }
 
@@ -211,15 +210,44 @@ public class ControleAbastecimento {
         model.addColumn("Modelo");
         model.addColumn("Ano de Fabricação");
 
-        // Preencher modelo com dados dos veículos
-        for (Veiculo veiculo : veiculos) {
-            model.addRow(new Object[]{veiculo.getPlacaDoCarro(), veiculo.getModeloDoCarro(), veiculo.getAnoDoCarro()});
+        // Mostrará ao usuário a lista de carros adicionado
+        try {
+            Connection con = ConectaMySQL.openDB();
+            Statement statement = con.createStatement();
+    
+            // Executar a consulta SQL para obter veículos
+            ResultSet rs = statement.executeQuery("SELECT * FROM Veiculo");
+    
+            // Preencher modelo com dados dos veículos
+            while (rs.next()) {
+                String placa = rs.getString("placaDoCarro");
+                String modelo = rs.getString("modeloDoCarro");
+                int ano = rs.getInt("anoDoCarro");
+    
+                model.addRow(new Object[]{placa, modelo, ano});
+            }
+    
+            // Configurar tabela
+            veiculosTable.setModel(model);
+            ((DefaultTableModel) veiculosTable.getModel()).fireTableDataChanged();
+    
+            rs.close();
+            statement.close();
+            ConectaMySQL.closeDB();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(frame, "Falha ao listar veículos.");
         }
 
-        // Configurar tabela
-        veiculosTable.setModel(model);
+        // // Preencher modelo com dados dos veículos
+        // for (Veiculo veiculo : veiculos) {
+        //     model.addRow(new Object[]{veiculo.getPlacaDoCarro(), veiculo.getModeloDoCarro(), veiculo.getAnoDoCarro()});
+        // }
 
-        ((DefaultTableModel) veiculosTable.getModel()).fireTableDataChanged();
+        // // Configurar tabela
+        // veiculosTable.setModel(model);
+
+        // ((DefaultTableModel) veiculosTable.getModel()).fireTableDataChanged();
     }
 
 //modelo que queremos usar
@@ -244,25 +272,11 @@ public class ControleAbastecimento {
 //        veiculosTable.setModel(model);
 //    }
 
-    private void calcularMediaPorLitro() {
-        if (abastecimentos.isEmpty()) {
-            JOptionPane.showMessageDialog(frame, "Não há abastecimentos cadastrados para calcular a média.");
-            return;
-        }
-
-        // Calcular média por litro
-        double totalKm = 0.0;
-        double totalLitros = 0.0;
-
-        for (Abastecimento abastecimento : abastecimentos) {
-            totalKm += abastecimento.getDistanciaPercorrida();
-            totalLitros += abastecimento.getQuantidadeDeLitros();
-        }
-
+    private double calcularMediaPorLitro(double totalKm , double totalLitros) {
         double mediaKmPorLitro = totalKm / totalLitros;
-
         // Exibir resultado
         resultadoTextArea.setText("Média de Km por Litro: " + String.format("%.2f", mediaKmPorLitro));
+        return mediaKmPorLitro;
     }
 
     public static void main(String[] args) {
@@ -274,42 +288,45 @@ public class ControleAbastecimento {
         });
     }
 
-public void cadastrarVeiculo() {
-    try {
-        ConectaMySQL conexao = new ConectaMySQL(); 
-        Connection cn = conexao.openDB();
-        PreparedStatement ps = cn.prepareStatement("INSERT INTO Veiculo (placaDoCarro,  modeloDoCarro, anoDoCarro)"
-        + "VALUES (?, ?, ?)");
+    public void cadastrarVeiculo() {
+        try {
+            ConectaMySQL conexao = new ConectaMySQL(); 
+            Connection cn = conexao.openDB();
+            PreparedStatement ps = cn.prepareStatement("INSERT INTO Veiculo (placaDoCarro,  modeloDoCarro, anoDoCarro)"
+            + "VALUES (?, ?, ?)");
 
-        ps.setString(1, veiculoPlacaField.getText()); //placa
-        ps.setString(2, veiculoModeloField.getText()); //modelo
-        ps.setInt(3, Integer.parseInt(veiculoAnoField.getText())); //anoDeFabricacao
+            ps.setString(1, veiculoPlacaField.getText()); //placa
+            ps.setString(2, veiculoModeloField.getText()); //modelo
+            ps.setInt(3, Integer.parseInt(veiculoAnoField.getText())); //anoDeFabricacao
 
-        ps.executeUpdate();
+            ps.executeUpdate();
 
-        JOptionPane.showMessageDialog(null, "Carro Cadastrado com sucesso!");
+            JOptionPane.showMessageDialog(null, "Carro Cadastrado com sucesso!");
 
-        Veiculo veiculoCadastrado = new Veiculo(
-                veiculoPlacaField.getText(),
-                veiculoModeloField.getText(),
-                Integer.parseInt(veiculoAnoField.getText())
-        );
-        veiculos.add(veiculoCadastrado);
+            Veiculo veiculoCadastrado = new Veiculo(
+                    veiculoPlacaField.getText(),
+                    veiculoModeloField.getText(),
+                    Integer.parseInt(veiculoAnoField.getText())
+            );
+            veiculos.add(veiculoCadastrado);
 
-        ps.close();
-        cn.close();
+            ps.close();
+            cn.close();
 
-        // Atualiza a tabela de veículos
-        listarVeiculos();
+            // Atualiza a tabela de veículos
+            listarVeiculos();
 
-        System.out.println("Conexão encerrada");
-    } catch (SQLException e) {
-        System.out.println("Falha ao realizar a operação.");
-        e.printStackTrace();
+            System.out.println("Conexão encerrada");
+        } catch (SQLException e) {
+            System.out.println("Falha ao realizar a operação.");
+            e.printStackTrace();
+        }
     }
-}
 
     public void CadastrarAbastecimento(){
+        double distanciaPercorrida = Double.parseDouble(abastecimentoDistanciaPercorridaField.getText());
+        double combustivelGasto = Double.parseDouble(abastecimentoQuantidadeLitrosField.getText());
+        double media = Double.parseDouble(String.format("%.2f", calcularMediaPorLitro(distanciaPercorrida,combustivelGasto)));
         try {
             ConectaMySQL conexao = new ConectaMySQL();
             Connection cn = conexao.openDB();
@@ -318,16 +335,29 @@ public void cadastrarVeiculo() {
 
             ps.setString(1, veiculoPlacaField.getText()); //placaDoCarro
             ps.setDate(2, new java.sql.Date(abastecimentoDateChooser.getDate().getTime())); // dataDeAbastecimento
-            ps.setString(3, tipoCombustivelComboBox.getActionCommand()); //tipoCombustivel
+            ps.setString(3,String.valueOf(tipoCombustivelComboBox.getSelectedItem())); //tipoCombustivel
             ps.setDouble(4, Double.parseDouble(abastecimentoPrecoLitroField.getText())); //precoPago
             ps.setDouble(5, Double.parseDouble(abastecimentoQuantidadeLitrosField.getText())); //quantidadeDeLitros
             ps.setDouble(6, Double.parseDouble(abastecimentoDistanciaPercorridaField.getText())); //distanciaPercorrida
-
+            ps.setDouble(7, media); // médiaPorLitro
 
 
             ps.executeUpdate();
 
             JOptionPane.showMessageDialog(null, "Abastecimento cadastrado com sucesso.");
+
+        // Adicionar o abastecimento à lista
+        Abastecimento novoAbastecimento = new Abastecimento(
+                veiculoPlacaField.getText(),
+                abastecimentoDateChooser.getDate(),
+                tipoCombustivelComboBox.getSelectedItem().toString(),
+                Double.parseDouble(abastecimentoPrecoLitroField.getText()),
+                Double.parseDouble(abastecimentoQuantidadeLitrosField.getText()),
+                Double.parseDouble(abastecimentoDistanciaPercorridaField.getText()),
+                0.0 // Você pode calcular a média posteriormente, se necessário
+        );
+        
+        abastecimentos.add(novoAbastecimento);
 
             ps.close();
             cn.close();
@@ -339,7 +369,6 @@ public void cadastrarVeiculo() {
         }
 
     }
-
 
     public void cadastrarPosto() {
         try {
@@ -367,6 +396,7 @@ public void cadastrarVeiculo() {
         }
 
     }
+    
     public void excluirVeiculo() throws Exception {
         Connection cn = null;
         Statement st = null;
@@ -377,10 +407,16 @@ public void cadastrarVeiculo() {
             String placa = JOptionPane.showInputDialog("Digite a placa do carro a ser excluido");
             Veiculo excluido = consultarPlaca(placa);
             int resp = JOptionPane.showConfirmDialog(null, "Confirma a exclusão do carro com a placa: \n" + excluido);
-
             if(resp == 0) {
-                st.executeUpdate("DELETE FROM Veiculos WHERE placaDoCarro='" + 
-                    excluido.getPlacaDoCarro() + "'");
+                st.executeUpdate("DELETE FROM Abastecimento WHERE veiculo_placaDoCarro='" 
+                + excluido.getPlacaDoCarro() + "'");
+                
+                st.executeUpdate("DELETE FROM Posto WHERE veiculo_placaDoCarro='" 
+                + excluido.getPlacaDoCarro() + "'");
+
+                st.executeUpdate("DELETE FROM Veiculo WHERE placaDoCarro='" 
+                + excluido.getPlacaDoCarro() + "'");
+
                 JOptionPane.showMessageDialog(null, "O Carro com a placa " +
                     excluido.getPlacaDoCarro() + " foi excluído com sucesso!!!");
             } else {
@@ -397,7 +433,7 @@ public void cadastrarVeiculo() {
 
     public Veiculo consultarPlaca(String nome) throws Exception {
         Veiculo veiculo = null;
-        String querycmd = "select * from veiculos where " + "placaDoCarro like ? ";
+        String querycmd = "select * from veiculo where " + "placaDoCarro like ? ";
 
         try {
             Connection con = ConectaMySQL.openDB();

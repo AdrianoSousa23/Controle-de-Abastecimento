@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 //import com.toedter.calendar.JDateChooser;
 
 
@@ -16,8 +18,8 @@ public class Abastecimento extends Veiculo {
     private String tipoCombustivel;
     private Double precoPago;
     private Double quantidadeDeLitros;
-    private Double distanciaPercorrida;
-    private Double mediaPorLitro;
+    private Double distanciaPercorrida; 
+    private static List<Abastecimento> abastecimentos;
 //    private JDateChooser abastecimentoDateChooser;
 
     public Abastecimento() {
@@ -32,7 +34,7 @@ public class Abastecimento extends Veiculo {
         this.precoPago = precoPago;
         this.quantidadeDeLitros = quantidadeDeLitros;
         this.distanciaPercorrida = distanciaPercorrida;
-        this.mediaPorLitro = mediaPorLitro;
+        abastecimentos = new ArrayList<>();
     }
 
     public Date getDataDeAbastecimento() {
@@ -76,40 +78,15 @@ public class Abastecimento extends Veiculo {
     }
 
     public Double getMediaPorLitro() {
-        return getDistanciaPercorrida()/getQuantidadeDeLitros();
+        if (quantidadeDeLitros != null && quantidadeDeLitros != 0 && distanciaPercorrida != null) {
+            return distanciaPercorrida / quantidadeDeLitros;
+        }
+        return 0.0;
     }
 
-//    public void CadastrarAbastecimento(){
-//        try {
-//            ConectaMySQL conexao = new ConectaMySQL();
-//            Connection cn = conexao.openDB();
-//            PreparedStatement ps = cn.prepareStatement("INSERT INTO Abastecimento (veiculo_placaDoCarro, dataDeAbastecimento, tipoCombustivel, precoPago, quantidadeDeLitros, distanciaPercorrida, mediaPorLitro)"
-//            + "VALUES (?, ?, ?, ?, ?, ?, ?)");
-//
-//            ps.setString(1, getPlacaDoCarro()); //placaDoCarro
-//            ps.setDate(2, new java.sql.Date(abastecimentoDateChooser.getDate().getTime())); // dataDeAbastecimento
-//            ps.setString(3, tipoCombustivel); //tipoCombustivel
-//            ps.setDouble(4, precoPago); //precoPago
-//            ps.setDouble(5, quantidadeDeLitros); //quantidadeDeLitros
-//            ps.setDouble(6, distanciaPercorrida); //distanciaPercorrida
-//            ps.setDouble(7, mediaPorLitro);
-//
-//
-//            ps.executeUpdate();
-//
-//            JOptionPane.showMessageDialog(null, "Abastecimento cadastrado com sucesso.");
-//
-//            ps.close();
-//            cn.close();
-//
-//            System.out.println("Conexão encerrada");
-//        } catch (SQLException e) {
-//            System.out.println("Falha ao realizar a operação.");
-//            e.printStackTrace();
-//        }
-//
-//    }
-
-
+    public void adicionarAbastecimento(Abastecimento abastecimento) {
+        // Adiciona o abastecimento à lista
+        abastecimentos.add(abastecimento);
+    }
 
 }
