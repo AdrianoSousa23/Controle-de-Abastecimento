@@ -1,16 +1,11 @@
 package entities;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
-import javax.swing.JOptionPane;
-
-import connection.ConectaMySQL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Posto extends Veiculo{
     private String nome;
     private String localizacao;
+    private static List<Posto> posto;
 
     public Posto() {
     }
@@ -19,6 +14,7 @@ public class Posto extends Veiculo{
         super(placaDoCarro);
         this.nome = nome;
         this.localizacao = localizacao;
+        posto = new ArrayList<>();
     }
 
     public String getNome() {
@@ -37,6 +33,7 @@ public class Posto extends Veiculo{
         this.localizacao = localizacao;
     }
 
-
-    
+    public void adicionarPosto(Posto postos) {
+        posto.add(postos);
+    }
 }

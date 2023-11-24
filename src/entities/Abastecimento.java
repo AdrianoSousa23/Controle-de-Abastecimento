@@ -1,17 +1,8 @@
 package entities;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
-//import com.toedter.calendar.JDateChooser;
-
-
-import javax.swing.JOptionPane;
-
-import connection.ConectaMySQL;
 
 public class Abastecimento extends Veiculo {
     private Date dataDeAbastecimento;

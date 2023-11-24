@@ -153,7 +153,7 @@ public class ControleAbastecimento {
         combustivelPanel.add(postoLocalizacaoField);
         combustivelPanel.add(new JLabel("Data do Abastecimento:"));
         combustivelPanel.add(abastecimentoDateChooser);
-        combustivelPanel.add(new JLabel("Preço por Litro:"));
+        combustivelPanel.add(new JLabel("Preço Pago:"));//mudei o nome para fazer mais sentido
         combustivelPanel.add(abastecimentoPrecoLitroField);
         combustivelPanel.add(new JLabel("Quantidade de Litros:"));
         combustivelPanel.add(abastecimentoQuantidadeLitrosField);
@@ -171,7 +171,7 @@ public class ControleAbastecimento {
         Veiculo veiculo = new Veiculo();
         Abastecimento abastecimento = new Abastecimento();
         Posto posto = new Posto();
-        calcularPanel.setBorder(BorderFactory.createTitledBorder("Calcular"));
+        calcularPanel.setBorder(BorderFactory.createTitledBorder("Cadastro/Calcular"));//mudei o nome para fazer mais sentido
 
         JButton cadastrarVeiculoButton = new JButton("Cadastrar Abastecimento");
         cadastrarVeiculoButton.addActionListener(new ActionListener() {
