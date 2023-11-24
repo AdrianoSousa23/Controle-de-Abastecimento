@@ -59,7 +59,7 @@ public class ControleAbastecimento {
     private void initialize() {
         frame = new JFrame("Controle de Abastecimento");
         frame.setSize(800, 600);  // Definindo tamanho inicial
-        frame.setBounds(100, 100, 1920, 1080);
+        frame.setBounds(100, 100, 1800, 800);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel panel = new JPanel(new GridBagLayout());
@@ -301,19 +301,20 @@ public class ControleAbastecimento {
 
             ps.executeUpdate();
 
-            JOptionPane.showMessageDialog(null, "Carro Cadastrado com sucesso!");
+            JOptionPane.showMessageDialog(null, "Carro cadastrado com sucesso!");
 
             Veiculo veiculoCadastrado = new Veiculo(
                     veiculoPlacaField.getText(),
                     veiculoModeloField.getText(),
                     Integer.parseInt(veiculoAnoField.getText())
             );
+
             veiculos.add(veiculoCadastrado);
 
             ps.close();
             cn.close();
 
-            // Atualiza a tabela de veículos
+            //Atualizar a tabela de veículos
             listarVeiculos();
 
             System.out.println("Conexão encerrada");
@@ -400,34 +401,60 @@ public class ControleAbastecimento {
     public void excluirVeiculo() throws Exception {
         Connection cn = null;
         Statement st = null;
-
+        ResultSet rs = null;
+    
         try {
             cn = ConectaMySQL.openDB();
             st = cn.createStatement();
-            String placa = JOptionPane.showInputDialog("Digite a placa do carro a ser excluido");
-            Veiculo excluido = consultarPlaca(placa);
-            int resp = JOptionPane.showConfirmDialog(null, "Confirma a exclusão do carro com a placa: \n" + excluido);
-            if(resp == 0) {
-                st.executeUpdate("DELETE FROM Abastecimento WHERE veiculo_placaDoCarro='" 
-                + excluido.getPlacaDoCarro() + "'");
-                
-                st.executeUpdate("DELETE FROM Posto WHERE veiculo_placaDoCarro='" 
-                + excluido.getPlacaDoCarro() + "'");
-
-                st.executeUpdate("DELETE FROM Veiculo WHERE placaDoCarro='" 
-                + excluido.getPlacaDoCarro() + "'");
-
-                JOptionPane.showMessageDialog(null, "O Carro com a placa " +
-                    excluido.getPlacaDoCarro() + " foi excluído com sucesso!!!");
-            } else {
-                JOptionPane.showMessageDialog(null, "O Carro com a placa " +
-                    excluido.getPlacaDoCarro() + " não foi excluído");
+    
+            // Consultar todos os carros existentes
+            rs = st.executeQuery("SELECT placaDoCarro FROM Veiculo");
+            
+            List<String> opcoes = new ArrayList<>();
+            while (rs.next()) {
+                opcoes.add(rs.getString("placaDoCarro"));
+            }
+    
+            // Mostrar opções para o usuário
+            Object[] opcoesArray = opcoes.toArray();
+            String placaSelecionada = (String) JOptionPane.showInputDialog(null,
+                    "Escolha o carro a ser excluído:", "Excluir Carro",
+                    JOptionPane.PLAIN_MESSAGE, null, opcoesArray, opcoesArray[0]);
+    
+            if (placaSelecionada != null) {
+                Veiculo excluido = consultarPlaca(placaSelecionada);
+                int resp = JOptionPane.showConfirmDialog(null, "Confirma a exclusão do carro com a placa: \n" + excluido);
+    
+                if (resp == 0) {
+                    st.executeUpdate("DELETE FROM Abastecimento WHERE veiculo_placaDoCarro='"
+                            + excluido.getPlacaDoCarro() + "'");
+    
+                    st.executeUpdate("DELETE FROM Posto WHERE veiculo_placaDoCarro='"
+                            + excluido.getPlacaDoCarro() + "'");
+    
+                    st.executeUpdate("DELETE FROM Veiculo WHERE placaDoCarro='"
+                            + excluido.getPlacaDoCarro() + "'");
+    
+                    JOptionPane.showMessageDialog(null, "O Carro com a placa " +
+                            excluido.getPlacaDoCarro() + " foi excluído com sucesso!!!");
+                } else {
+                    JOptionPane.showMessageDialog(null, "O Carro com a placa " +
+                            excluido.getPlacaDoCarro() + " não foi excluído");
+                }
             }
         } catch (SQLException e) {
             throw new Exception("Falha ao acessar base de dados. \n" + e.getMessage());
         } finally {
-            st.close();
-            cn.close();
+            // Certifique-se de fechar o ResultSet além de Statement e Connection
+            if (rs != null) {
+                rs.close();
+            }
+            if (st != null) {
+                st.close();
+            }
+            if (cn != null) {
+                cn.close();
+            }
         }
     }
 

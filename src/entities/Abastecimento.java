@@ -19,6 +19,7 @@ public class Abastecimento extends Veiculo {
     private Double precoPago;
     private Double quantidadeDeLitros;
     private Double distanciaPercorrida; 
+    private Double mediaPorLitro;
     private static List<Abastecimento> abastecimentos;
 //    private JDateChooser abastecimentoDateChooser;
 
@@ -34,6 +35,7 @@ public class Abastecimento extends Veiculo {
         this.precoPago = precoPago;
         this.quantidadeDeLitros = quantidadeDeLitros;
         this.distanciaPercorrida = distanciaPercorrida;
+        this.mediaPorLitro = mediaPorLitro;
         abastecimentos = new ArrayList<>();
     }
 
