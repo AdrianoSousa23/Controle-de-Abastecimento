@@ -8,7 +8,7 @@ import java.sql.Statement;
 public class ConectaMySQL {
     private final static String url = "jdbc:mysql://localhost:3306/AbastecimentosVeiculos";
     private final static String username = "root";
-    private final static String password = "2022"; // verifica a senha 
+    private final static String password = "2022"; // verifica a senha
     private static Connection con;
     private static Statement stmt;
     private ResultSet rs;

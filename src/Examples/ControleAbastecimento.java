@@ -12,8 +12,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -178,8 +181,12 @@ public class ControleAbastecimento {
             @Override
             public void actionPerformed(ActionEvent e) {
                 cadastrarVeiculo();
-                CadastrarAbastecimento();
-                //cadastrarPosto();
+                try {
+                    CadastrarAbastecimento();
+                } catch (ParseException ex) {
+                    throw new RuntimeException(ex);
+                }
+                cadastrarPosto();
 
             }
         });
@@ -206,71 +213,43 @@ public class ControleAbastecimento {
     private void listarVeiculos() {
         // Configurar modelo da tabela
         DefaultTableModel model = new DefaultTableModel();
-        model.addColumn("Placa");
         model.addColumn("Modelo");
-        model.addColumn("Ano de Fabricação");
+        model.addColumn("Data de Abastecimento");
+        model.addColumn("Média por Litro");
+        model.addColumn("Posto");
 
-        // Mostrará ao usuário a lista de carros adicionado
+        // Mostrará ao usuário a lista de abastecimentos
         try {
             Connection con = ConectaMySQL.openDB();
             Statement statement = con.createStatement();
-    
-            // Executar a consulta SQL para obter veículos
-            ResultSet rs = statement.executeQuery("SELECT * FROM Veiculo");
-    
-            // Preencher modelo com dados dos veículos
+
+            // Executar a consulta SQL para obter informações de abastecimento
+            ResultSet rs = statement.executeQuery("SELECT v.modeloDoCarro, a.dataDeAbastecimento, a.mediaPorLitro, p.nome FROM Abastecimento a " +
+                    "JOIN Veiculo v ON a.veiculo_placaDoCarro = v.placaDoCarro " +
+                    "JOIN Posto p ON a.veiculo_placaDoCarro = p.veiculo_placaDoCarro");
+
+            // Preencher modelo com dados dos abastecimentos
             while (rs.next()) {
-                String placa = rs.getString("placaDoCarro");
                 String modelo = rs.getString("modeloDoCarro");
-                int ano = rs.getInt("anoDoCarro");
-    
-                model.addRow(new Object[]{placa, modelo, ano});
+                java.sql.Date dataAbastecimento = rs.getDate("dataDeAbastecimento");
+                double mediaPorLitro = rs.getDouble("mediaPorLitro");
+                String posto = rs.getString("nome");
+
+                model.addRow(new Object[]{modelo, dataAbastecimento, mediaPorLitro, posto});
             }
-    
+
             // Configurar tabela
             veiculosTable.setModel(model);
             ((DefaultTableModel) veiculosTable.getModel()).fireTableDataChanged();
-    
+
             rs.close();
             statement.close();
             ConectaMySQL.closeDB();
         } catch (SQLException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(frame, "Falha ao listar veículos.");
+            JOptionPane.showMessageDialog(frame, "Falha ao listar abastecimentos.");
         }
-
-        // // Preencher modelo com dados dos veículos
-        // for (Veiculo veiculo : veiculos) {
-        //     model.addRow(new Object[]{veiculo.getPlacaDoCarro(), veiculo.getModeloDoCarro(), veiculo.getAnoDoCarro()});
-        // }
-
-        // // Configurar tabela
-        // veiculosTable.setModel(model);
-
-        // ((DefaultTableModel) veiculosTable.getModel()).fireTableDataChanged();
     }
-
-//modelo que queremos usar
-
-//    private void listarVeiculos() {
-//        // Configurar modelo da tabela
-//        DefaultTableModel model = new DefaultTableModel();
-//        model.addColumn("Modelo");
-//        model.addColumn("Data de Abastecimento");
-//        model.addColumn("Média por litro");
-//        model.addColumn("Posto");
-//
-//        // Preencher modelo com dados dos veículos
-//        for (Abastecimento abastecimento : abastecimentos) {
-//            Veiculo veiculo = new Veiculo();
-//            Posto posto = new Posto();
-//            veiculo.getModeloDoCarro();
-//            model.addRow(new Object[]{veiculo.getModeloDoCarro(),abastecimento.getDataDeAbastecimento(), abastecimento.getMediaPorLitro(), posto.getNome()});
-//        }
-//
-//        // Configurar tabela
-//        veiculosTable.setModel(model);
-//    }
 
     private double calcularMediaPorLitro(double totalKm , double totalLitros) {
         double mediaKmPorLitro = totalKm / totalLitros;
@@ -324,10 +303,12 @@ public class ControleAbastecimento {
         }
     }
 
-    public void CadastrarAbastecimento(){
+    public void CadastrarAbastecimento() throws ParseException {
         double distanciaPercorrida = Double.parseDouble(abastecimentoDistanciaPercorridaField.getText());
         double combustivelGasto = Double.parseDouble(abastecimentoQuantidadeLitrosField.getText());
-        double media = Double.parseDouble(String.format("%.2f", calcularMediaPorLitro(distanciaPercorrida,combustivelGasto)));
+        NumberFormat format = NumberFormat.getInstance(Locale.getDefault());
+        Number mediaNumber = format.parse(String.format("%.2f", calcularMediaPorLitro(distanciaPercorrida, combustivelGasto)));
+        double media = mediaNumber.doubleValue();
         try {
             ConectaMySQL conexao = new ConectaMySQL();
             Connection cn = conexao.openDB();
@@ -337,7 +318,9 @@ public class ControleAbastecimento {
             ps.setString(1, veiculoPlacaField.getText()); //placaDoCarro
             ps.setDate(2, new java.sql.Date(abastecimentoDateChooser.getDate().getTime())); // dataDeAbastecimento
             ps.setString(3,String.valueOf(tipoCombustivelComboBox.getSelectedItem())); //tipoCombustivel
-            ps.setDouble(4, Double.parseDouble(abastecimentoPrecoLitroField.getText())); //precoPago
+            // Correção: substituir a vírgula por ponto antes de converter para double
+            String precoLitroText = abastecimentoPrecoLitroField.getText().replace(",", ".");
+            ps.setDouble(4, Double.parseDouble(precoLitroText)); //precoPago
             ps.setDouble(5, Double.parseDouble(abastecimentoQuantidadeLitrosField.getText())); //quantidadeDeLitros
             ps.setDouble(6, Double.parseDouble(abastecimentoDistanciaPercorridaField.getText())); //distanciaPercorrida
             ps.setDouble(7, media); // médiaPorLitro
