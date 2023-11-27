@@ -213,6 +213,7 @@ public class ControleAbastecimento {
     private void listarVeiculos() {
         // Configurar modelo da tabela
         DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("Placa");
         model.addColumn("Modelo");
         model.addColumn("Data de Abastecimento");
         model.addColumn("Média por Litro");
@@ -224,18 +225,19 @@ public class ControleAbastecimento {
             Statement statement = con.createStatement();
 
             // Executar a consulta SQL para obter informações de abastecimento
-            ResultSet rs = statement.executeQuery("SELECT v.modeloDoCarro, a.dataDeAbastecimento, a.mediaPorLitro, p.nome FROM Abastecimento a " +
+            ResultSet rs = statement.executeQuery("SELECT v.placaDoCarro, v.modeloDoCarro, a.dataDeAbastecimento, a.mediaPorLitro, p.nome FROM Abastecimento a " +
                     "JOIN Veiculo v ON a.veiculo_placaDoCarro = v.placaDoCarro " +
                     "JOIN Posto p ON a.veiculo_placaDoCarro = p.veiculo_placaDoCarro");
 
             // Preencher modelo com dados dos abastecimentos
             while (rs.next()) {
+                String placa = rs.getString("placaDoCarro");
                 String modelo = rs.getString("modeloDoCarro");
                 java.sql.Date dataAbastecimento = rs.getDate("dataDeAbastecimento");
                 double mediaPorLitro = rs.getDouble("mediaPorLitro");
                 String posto = rs.getString("nome");
 
-                model.addRow(new Object[]{modelo, dataAbastecimento, mediaPorLitro, posto});
+                model.addRow(new Object[]{placa, modelo, dataAbastecimento, mediaPorLitro, posto});
             }
 
             // Configurar tabela
