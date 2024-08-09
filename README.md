@@ -1,6 +1,6 @@
 # Controle de Abastecimento de Veículos
 
-Este projeto é uma aplicação desktop desenvolvida em Java utilizando a biblioteca Swing (JFrame) para criar uma interface gráfica. A aplicação tem como objetivo gerenciar o controle de abastecimento de veículos, permitindo o cadastro de veículos, abastecimentos, e postos de combustíveis, além de calcular a média de quilômetros por litro.
+Este projeto é uma aplicação desktop desenvolvida em Java no 3º semestre da faculdade, utilizando a biblioteca Swing (JFrame) para criar uma interface gráfica. A aplicação tem como objetivo gerenciar o controle de abastecimento de veículos, permitindo o cadastro de veículos, abastecimentos, e postos de combustíveis, além de calcular a média de quilômetros por litro.
 
 
 ``` mermaid
